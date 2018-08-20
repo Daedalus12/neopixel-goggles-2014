@@ -3,6 +3,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(16, 3, NEO_GRB + NEO_KHZ800);
 
 #define NPINS 16
 #define NSTEPS 64
+#define TOP_PIN 0
 
 // define universal constants
 const float pi = 3.14159; 
@@ -62,9 +63,14 @@ void loop(){
 
   colorSetJewelAll(huesA, sats, false);
   colorSetJewelAll(huesB, sats, true);
+  for (byte i=0; i<NPINS; ++i) hues[i] = huesA[i];
   for (j=0; j<NSTEPS*nCycles; j++){
+    if (j%NSTEPS == 0 && j > 0) {
+        for (byte i=0; i<NPINS; ++i) huesB[i] = huesA[i];
+        for (byte i=0; i<NPINS; ++i) huesA[i] = hues[i];
+    }
     valPulse(vals, cosValues[j%NSTEPS]);
-    colorShift(hues, huesA, huesB, j%NSTEPS);
+    colorJewelWaterfall(hues, huesA, huesB, j%NSTEPS);
     update(vals, sats, hues);
     delay(pause);
   }
@@ -80,6 +86,17 @@ void loop(){
 
   nCycles = random(3) + 1;
 
+  colorSetJewelAll(huesA, sats, false);
+  colorSetJewelAll(huesB, sats, true);
+  for (j=0; j<NSTEPS*nCycles; j++){
+    valPulse(vals, cosValues[j%NSTEPS]);
+    colorJewelSpin(hues, huesA, huesB, j%NSTEPS);
+    update(vals, sats, hues);
+    delay(pause);
+  }
+
+  nCycles = random(3) + 1;
+
   for (j=0; j<NSTEPS*nCycles; j++){
     valPulse(vals, cosValues[j%NSTEPS]);
     colorSpin(hues, sats);
@@ -87,6 +104,17 @@ void loop(){
     delay(pause);
   }  
 
+  nCycles = random(3) + 1;
+
+  colorSetJewelAll(huesA, sats, false);
+  colorSetJewelAll(huesB, sats, true);
+  for (j=0; j<NSTEPS*nCycles; j++){
+    valPulse(vals, cosValues[j%NSTEPS]);
+    colorShift(hues, huesA, huesB, j%NSTEPS);
+    update(vals, sats, hues);
+    delay(pause);
+  }
+  
   nCycles = random(3) + 1;
 
   for (j=0; j<NSTEPS*nCycles; j++){
