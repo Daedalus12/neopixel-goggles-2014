@@ -1,35 +1,37 @@
 #include <Adafruit_NeoPixel.h>
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(16, 3, NEO_GRB + NEO_KHZ800);
 
+#define NPIN 16
+#define NSTEPS 64
+
 // define universal constants
 const float pi = 3.14159; 
 const float tau = pi*2;
+float cosValues[NSTEPS];
 
 // define global parameters
 const int pause = 20;
 const int PIN = 3;
-const int NPIN = 16;
 const byte VALMAX = 31;
 const byte VALMIN = 3;
-const float DTHETA = tau/64.;
 
 // define derived parameters
 const byte VALAVG = ((float)VALMAX + (float)VALMIN)/2.0;
 const byte VALAMP = (float)VALMAX - (((float)VALMAX + (float)VALMIN)/2.0);
 
 // initialize arrays of 0-255 values for brightness and colors
-byte vals[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-byte sats[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-byte hues[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+byte vals[NPIN];
+byte sats[NPIN];
+byte hues[NPIN];
 
 boolean reset;
 
 byte valSpinN = 1;
 byte valSpinIncr = 1;
 
-byte valSpinVals[]  = {0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38};
-byte valSpinSteps[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-byte valSpinInds[]  = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+byte valSpinVals[16];
+byte valSpinSteps[16];
+byte valSpinInds[16];
 
 void setup(){
   strip.begin();
@@ -38,25 +40,26 @@ void setup(){
 
   for (byte k=0; k<16; k++) {
     valSpinVals[k] = (float)VALMAX * (float)k/15.;
-  }
-  
-  for (byte s=0; s<16; s++){
-    valSpinInds[s] = s;
+    valSpinInds[k] = k;
+    vals[k] = 0;
+    sats[k] = 0;
+    hues[k] = 0;
   }
 
+  for (int i=0; i<NSTEPS; i++) {
+    cosValues[i] = cos(2*pi*(float)i/NSTEPS);
+    Serial.print(i);
+    Serial.print("\t");
+    Serial.println(cosValues[i]);
 
+  }
 }
 
 float theta;
 float dtheta = tau/64.;
-byte j;
+unsigned long j;
 
 byte nCycles;
-
-template<class T>
-trigScale(T& ret, const float& val, const T& valMin, const T& valMax) {
-    ret = valMin + 0.5*(valMax - valMin)*(1 + val);
-}
 
 void loop(){
 
@@ -64,11 +67,7 @@ void loop(){
   theta = pi/2.;
 
   for (j=0; j<64*nCycles; j++){
-    theta += dtheta;
-    if (theta > tau){
-      theta -= tau;
-    }
-    valPulse(vals);
+    valPulse(vals, cosValues[j%NSTEPS]);
     colorConstant(hues, sats);
     update(vals, sats, hues);
     delay(pause);
@@ -78,13 +77,7 @@ void loop(){
   theta = pi/2.;
 
   for (j=0; j<64*nCycles; j++){
-
-    theta += dtheta;
-    if (theta > tau){
-      theta -= tau;
-    }
-
-    valPulse(vals);
+    valPulse(vals, cosValues[j%NSTEPS]);
     colorSpin(hues, sats);
     update(vals, sats, hues);
     delay(pause);
@@ -94,11 +87,7 @@ void loop(){
   theta = pi/2.;
 
   for (j=0; j<64*nCycles; j++){
-    theta += dtheta;
-    if (theta > tau){
-      theta -= tau;
-    }
-    valPulse(vals);
+    valPulse(vals, cosValues[j%NSTEPS]);
     colorCycle(hues, sats);
     update(vals, sats, hues);
     delay(pause);
@@ -108,16 +97,24 @@ void loop(){
   theta = pi/2.;
 
   for (j=0; j<64*nCycles; j++){
-    theta += dtheta;
-    if (theta > tau){
-      theta -= tau;
-    }
     valSpin(vals);
     colorCycle(hues, sats);
     update(vals, sats, hues);
     delay(pause);
   }  
-  
+
+  nCycles = random(3) + 3;
+
+  for (j=0; j<NSTEPS*nCycles; j++){
+    if (j%NSTEPS == 0 || j == 0) {
+      colorSetJewel(hues, sats);      
+    }
+    
+    valPulse(vals, cosValues[j%NSTEPS]);
+    update(vals, sats, hues);
+    delay(pause);
+  }  
+
   
 
 }
