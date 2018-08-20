@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(16, 3, NEO_GRB + NEO_KHZ800);
 
-#define NPIN 16
+#define NPINS 16
 #define NSTEPS 64
 
 // define universal constants
@@ -19,11 +19,11 @@ const byte VALAMP = (float)VALMAX - (((float)VALMAX + (float)VALMIN)/2.0);
 float cosValues[NSTEPS];
 
 // initialize arrays of 0-255 values for brightness and colors
-byte vals[NPIN];
-byte sats[NPIN];
-byte hues[NPIN];
-byte huesA[NPIN];
-byte huesB[NPIN];
+byte vals[NPINS];
+byte sats[NPINS];
+byte hues[NPINS];
+byte huesA[NPINS];
+byte huesB[NPINS];
 
 boolean reset;
 
