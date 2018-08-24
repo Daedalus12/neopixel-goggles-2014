@@ -1,16 +1,17 @@
 #include <Adafruit_NeoPixel.h>
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(16, 3, NEO_GRB + NEO_KHZ800);
 
 #define NPINS 16
 #define NSTEPS 64
 #define TOP_PIN 0
+#define PIN 16
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NPINS, PIN, NEO_GRB + NEO_KHZ800);
 
 // define universal constants
 const float pi = 3.14159; 
 
 // define global parameters
 const int pause = 20;
-const int PIN = 3;
 const byte VALMAX = 31;
 const byte VALMIN = 3;
 
